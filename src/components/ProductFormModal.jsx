@@ -5,9 +5,12 @@ export default function ProductFormModal({ onClose }) {
   const isEdit = Boolean(product);
   const [nama, setNama] = useState(product ? product.nama : "");
   const [harga, setHarga] = useState(product ? String(product.harga) : "");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!nama.trim()) return setError("Nama produk wajib diisi.");
+    if (Number(harga) <= 0) return setError("Harga harus lebih dari 0.");
     onSave({ nama: nama.trim(), harga: Number(harga) });
   };
 
@@ -33,11 +36,12 @@ export default function ProductFormModal({ onClose }) {
           onChange={(e) => setHarga(e.target.value)}
           placeholder="Contoh: 5000"
         />
+        <small className={error ? "error" : "muted"}>
+          {error || "Harga harus lebih dari 0."}
+        </small>
 
         <div className="modal-actions">
-          <button type="button" className="btn btn-outline" onClick={onClose}>
-            Batal
-          </button>
+          <button type="button" className="btn btn-outline" onClick={onClose}>Batal</button>
           <button type="submit" className="btn btn-primary">
             {isEdit ? "Simpan Perubahan" : "Simpan Produk"}
           </button>
