@@ -1,122 +1,83 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { initialProducts } from "./data/products";
+import ProductCard from "./components/ProductCard";
+import ProductFormModal from "./components/ProductFormModal";
+import DeleteModal from "./components/DeleteModal";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [products, setProducts] = useState(initialProducts);
+  const [search, setSearch] = useState("");
+  const [modal, setModal] = useState(null); 
+
+  const filtered = products.filter((p) =>
+    p.nama.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const closeModal = () => setModal(null);
+
+  const handleAdd = (data) => {
+    const nextId = products.length ? Math.max(...products.map((p) => p.id)) + 1 : 1;
+    setProducts([...products, { id: nextId, ...data }]);
+    closeModal();
+  };
+
+  const handleEdit = (data) => {
+    setProducts(products.map((p) => (p.id === modal.product.id ? { ...p, ...data } : p)));
+    closeModal();
+  };
+
+  const handleDelete = () => {
+    setProducts(products.filter((p) => p.id !== modal.product.id));
+    closeModal();
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <div className="container">
+      <header className="header">
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+          <h1>Manajemen Produk</h1>
+          <p className="muted">Kelola daftar produk dan harga dalam satu tempat.</p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+        <button className="btn btn-primary" onClick={() => setModal({ type: "add" })}>
+          + Tambah Produk
         </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      <div className="toolbar">
+        <input
+          className="search"
+          placeholder="Cari nama produk..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <span className="muted">{products.length} produk</span>
+      </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <div className="grid">
+        {filtered.map((p) => (
+          <ProductCard
+            key={p.id}
+            id={p.id}
+            nama={p.nama}
+            harga={p.harga}
+            onEdit={() => setModal({ type: "edit", product: p })}
+            onDelete={() => setModal({ type: "delete", product: p })}
+          />
+        ))}
+      </div>
+      {filtered.length === 0 && <p className="muted">Produk tidak ditemukan.</p>}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <small className="muted">
+        Menampilkan {filtered.length} dari {products.length} produk
+      </small>
+
+      {modal?.type === "add" && <ProductFormModal onSave={handleAdd} onClose={closeModal} />}
+      {modal?.type === "edit" && (
+        <ProductFormModal product={modal.product} onSave={handleEdit} onClose={closeModal} />
+      )}
+      {modal?.type === "delete" && (
+        <DeleteModal product={modal.product} onConfirm={handleDelete} onClose={closeModal} />
+      )}
+    </div>
+  );
 }
-
-export default App
