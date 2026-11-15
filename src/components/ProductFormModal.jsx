@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Modal from "./Modal";
 
-export default function ProductFormModal({ onClose }) {
+export default function ProductFormModal({ product, onSave, onClose }) {
   const isEdit = Boolean(product);
   const [nama, setNama] = useState(product ? product.nama : "");
   const [harga, setHarga] = useState(product ? String(product.harga) : "");
