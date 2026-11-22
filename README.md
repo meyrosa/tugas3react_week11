@@ -1,16 +1,33 @@
-# React + Vite
+# Manajemen Produk
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplikasi CRUD produk dengan React, React Router, dan Tailwind CSS.
 
-Currently, two official plugins are available:
+## Cara Menjalankan
+```bash
+npm install
+npm run dev
+```
+Buka alamat `localhost` yang muncul di terminal.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Route
+| URL | Halaman | Keterangan |
+|---|---|---|
+| `/` | DashboardPage | Ringkasan produk (jumlah, rata-rata, tertinggi, terendah) |
+| `/products` | ProductsPage | Daftar produk, cari, tambah, edit, hapus (modal) |
+| `/products/:id` | ProductDetailPage | Detail produk sesuai ID, ada pesan jika ID tidak ada |
+| `/settings` | SettingsPage | Pilih tampilan produk: grid atau list |
+| `*` | NotFoundPage | Halaman 404 untuk URL tidak dikenal |
 
-## React Compiler
+## Lokasi State Bersama
+`products` dan `displayMode` disimpan dengan `useState` di `src/App.jsx`, di atas `Routes`, lalu dikirim ke halaman lewat props. Dengan begitu data tidak hilang saat berpindah halaman. `displayMode` juga disimpan di `localStorage` (opsional) agar tetap ada setelah reload. Data produk mengikuti mekanisme sebelumnya (memori aplikasi), jadi kembali ke data awal saat reload.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Pembagian Komponen
+- `layouts/AppLayout.jsx`: kerangka halaman (Navbar + `Outlet`)
+- `components/Navbar.jsx`: menu dengan `NavLink` (menu aktif)
+- `components/Button.jsx`: tombol reusable dengan varian
+- `components/Modal.jsx`: pembungkus pop-up (Escape, fokus keyboard)
+- `components/ProductCard.jsx`: kartu produk (mode grid/list)
+- `components/ProductFormModal.jsx`: form tambah dan edit (validasi harga > 0)
+- `components/DeleteModal.jsx`: konfirmasi hapus
+- `pages/*`: satu komponen per route
+- `data/products.js`: data awal produk
